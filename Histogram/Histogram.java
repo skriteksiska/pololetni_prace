@@ -1,15 +1,17 @@
 public class Histogram {
- 	private static final int MAXIMUM_RADEK = 20;
+ 	private static final int MAXIMUM_RADEK = 14;
 
-	private static void vypis(int[] vyskySloupcu, int rozsahSloupce) {
-		/*for (int i=0; i < vyskySloupcu.length; i++) {
-			System.out.printf("%d ", vyskySloupcu[i]);
+	private static void vypis(int[] poleSloupcu, int rozsahSloupce, int min) {
+		/* Pro ladeni:
+		for (int i=0; i < poleSloupcu.length; i++) {
+			System.out.printf("%d ", poleSloupcu[i]);
 		}
-		System.out.printf(":D%d ", rozsahSloupce);*/
+		System.out.printf(":D%d ", rozsahSloupce); */
+		
 		int radku = 0;
-		for (int i=0; i < vyskySloupcu.length; i++) {
-			if (vyskySloupcu[i] > radku) {
-				radku = vyskySloupcu[i];
+		for (int i=0; i < poleSloupcu.length; i++) {
+			if (poleSloupcu[i] > radku) {
+				radku = poleSloupcu[i];
 			}	
 		}
 		
@@ -18,19 +20,41 @@ public class Histogram {
 		  
 		while (radku > 0) {
 			System.out.printf("%"+maxDelka+"dx |", radku);
-			for (int i=0; i < vyskySloupcu.length; i++) {
-				if (vyskySloupcu[i] >= radku) {
-					System.out.printf(" XX");
+			for (int i=0; i < poleSloupcu.length; i++) {
+				if (poleSloupcu[i] >= radku) {
+					System.out.printf("  XXX");
 				}
 				else {
-					System.out.printf("   ");
+					System.out.printf("     ");
 				}
 			}
 			radku--;
 			System.out.println();
 		}
 		
-		//System.out.printf()
+		// vypsani spodni linky
+		for (int i=0; i <= maxDelka; i++) {
+			System.out.printf(" ");
+		}
+		System.out.printf(" +-");
+		for (int i=0; i < poleSloupcu.length; i++) {
+			System.out.printf("-----");
+		}
+		System.out.println();
+		
+		// popis spodni osy
+		for (int i=-2; i <= maxDelka; i++) {
+			System.out.printf(" ");
+		}
+		for (int i=0; i < poleSloupcu.length; i++) {
+			System.out.printf("%4d", (i + min/rozsahSloupce) * rozsahSloupce);
+			if (rozsahSloupce == 1) {
+				System.out.printf(" ");
+			}
+			else {
+			    System.out.printf("+");
+			}
+		}
 		
 	}
 
@@ -56,29 +80,38 @@ public class Histogram {
 		int[] seznam = cetnosti.seznamCisel();
 		
 		
-		/* urci, kolik jaky rozsah bude mit kazdy sloupec (1, 10, 100, ...)
+		/* urci, kolik cisel bude v jednom sloupci (1, 5, 10, 50, 100, ...),
 		   aby se to pohodlne veslo na radek */
 		int rozsahSloupce = 1;
+		boolean tedPetku = true;
 		while (max-min > MAXIMUM_RADEK * rozsahSloupce) {
-			rozsahSloupce *= 10;		
+			if (tedPetku) {
+				rozsahSloupce *= 5;
+				tedPetku = false;
+			}
+			else {			
+				rozsahSloupce *= 2;
+				tedPetku = true;
+			}		
 		}
 		
 		int pocetSloupcu = (int) Math.ceil((1+max-min) / (double) rozsahSloupce);
-		int[] vyskySloupcu = new int[pocetSloupcu];
+		// v promenne seznam nemame hodnoty serazene
+		int[] poleSloupcu = new int[pocetSloupcu];
 		
 		// pro kazdy sloupec histogramu
 		for (int i=0; i < pocetSloupcu; i++) {
-			vyskySloupcu[i] = 0;
+			poleSloupcu[i] = 0;
 			for (int j=0; j < seznam.length; j++) {
-				// kazde cislo v tomto sloupci
+				// jestli patri do tohoto sloupce
 				if ((seznam[j] >= min+i*rozsahSloupce) && (seznam[j] < min + (i+1)*rozsahSloupce )) {
-					vyskySloupcu[i] += cetnosti.getCetnost(j);
+					poleSloupcu[i] += cetnosti.getCetnost(j);
 				}
 			}
 		}
 		
 		
-		vypis(vyskySloupcu, rozsahSloupce);
+		vypis(poleSloupcu, rozsahSloupce, min);
 	}
 	
 }
